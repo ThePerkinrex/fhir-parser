@@ -7,7 +7,7 @@ from subprocess import check_call, CalledProcessError
 
 from fhirspec import FHIRSpecWriter
 
-import fhirrenderer
+from . import fhirrenderer
 
 __author__ = "Md Nazrul Islam <email2nazrul@gmail.com>"
 
@@ -57,10 +57,13 @@ def ensure_init_py(settings, version_info):
     """ """
     init_tpl = INIT_TPL.format(version_info.version, "element_type")
     test_init_tpl = TEST_INIT_TPL.format(version_info.version, "element_type")
-    for file_location, tpl in [
+    locations = [
         (settings.RESOURCE_TARGET_DIRECTORY, init_tpl),
-        (settings.UNITTEST_TARGET_DIRECTORY, test_init_tpl),
-    ]:
+
+    ]
+    if settings.WRITE_UNITTESTS:
+        locations.append((settings.UNITTEST_TARGET_DIRECTORY, test_init_tpl))
+    for file_location, tpl in locations:
         if (file_location / "__init__.py").exists():
             lines = list()
             has_fhir_version = False
@@ -179,13 +182,13 @@ class ResourceWriter(FHIRSpecWriter):
 
 
 class FhirPathExpressionParserWriter:
-    output_dir: pathlib.Path = None
-    grammar_path: pathlib.Path = None
+    output_dir: pathlib.Path | None = None
+    grammar_path: pathlib.Path | None = None
     antlr4_executable: str = "antlr4"
-    antlr4_version: str = None
+    antlr4_version: str | None = None
 
     def __init__(
-        self, output_dir=typing.Union[pathlib.Path, str], antlr4_version: str = "4.9.3"
+        self, output_dir: pathlib.Path | str, antlr4_version: str = "4.9.3"
     ):
         """ """
         if isinstance(output_dir, str):

@@ -235,4 +235,4 @@ MANUAL_PROFILES = [
     ),
     ("templates/fhirtypes.py", "fhirtypes", FHIR_PRIMITIVES),
 ]
-RESOURCES_WRITER_CLASS = "utils.ResourceWriter"
+RESOURCES_WRITER_CLASS = "fhir_parser.utils.ResourceWriter"

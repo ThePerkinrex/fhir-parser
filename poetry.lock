@@ -210,10 +210,8 @@ description = "Python representation of FHIR® https://www.hl7.org/fhir/ specifi
 optional = false
 python-versions = ">=3.6"
 groups = ["main"]
-files = [
-    {file = "fhirspec-0.4.0-py3-none-any.whl", hash = "sha256:43b6dc4914c41a7c5a8440132c5fe835c1c9712ab9ee6c40044ecd88fdd798f1"},
-    {file = "fhirspec-0.4.0.tar.gz", hash = "sha256:02a0524c8f58fa01d9c5640529025fff5a77fb013726b45b5a2cc5d3f8d305b4"},
-]
+files = []
+develop = false
 
 [package.dependencies]
 setuptools = "*"
@@ -223,6 +221,12 @@ all = ["autoflake", "black", "flake8", "isort", "json5", "mypy", "pytest (==6.1.
 dev = ["autoflake", "json5", "vulture"]
 test = ["black", "flake8", "isort", "mypy", "pytest (==6.1.2)", "pytest-cov (==2.10.1)"]
 toml = ["pytoml"]
+
+[package.source]
+type = "git"
+url = "https://github.com/ThePerkinrex/fhirspec.git"
+reference = "HEAD"
+resolved_reference = "ac342b3510c4474f1ee450f1c8c82d80cd9593e1"
 
 [[package]]
 name = "idna"
@@ -564,4 +568,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10"
-content-hash = "27acb31e14ef9fa5753772e864da39140da5ca5636564e6f2076d5c670e39859"
+content-hash = "2e55fa1d247457e8ffcb2ae32a6833499b62b149fac48363e93b3752cd627e25"

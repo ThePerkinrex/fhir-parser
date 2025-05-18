@@ -14,16 +14,20 @@ dependencies = [
     "requests (>=2.32.3,<3.0.0)",
     "colorlog (==2.10.0)",
     "click (>=8.2.0,<9.0.0)",
-    "fhirspec (>=0.4.0,<0.5.0)",
     "pydantic (>=2.11.4,<3.0.0)",
     "antlr4-tools (>=0.2.2,<0.3.0)",
-    "fhir-core (>=1.0.1,<2.0.0)"
+    "fhir-core (>=1.0.1,<2.0.0)",
+    "fhirspec @ git+https://github.com/ThePerkinrex/fhirspec.git",
 ]
 
 [tool.poetry]
 packages = [
     { include = "fhir_parser", from = "src" },
 ]
+
+[project.scripts]
+generate = "fhir_parser.generate:main"
+
 
 
 [build-system]

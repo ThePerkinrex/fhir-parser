@@ -10,16 +10,18 @@
 
 import sys
 
-import config
-import fhirloader
+from . import config
+from . import fhirloader
 import fhirspec
 import typing
 import click
 import pathlib
 
-from utils import ensure_init_py
-from utils import update_pytest_fixture
-from utils import FhirPathExpressionParserWriter
+from .utils import ensure_init_py
+from .utils import update_pytest_fixture
+from .utils import FhirPathExpressionParserWriter
+
+from .ig import add_igs_to_spec, fhir_package_files
 
 _cache_path = "downloads"
 
@@ -72,10 +74,10 @@ def main(
     load_only: bool,
     cache_only: bool,
     build_previous_versions: bool,
-    fhir_release: str = None,
-    previous_versions: typing.Sequence[str] = None,
+    fhir_release: str | None = None,
+    previous_versions: typing.Sequence[str] | None = None,
     fhir_path_expression: bool = False,
-    fhir_path_expression_output_dir: str = None,
+    fhir_path_expression_output_dir: str | None = None,
 ):
     """
     required_variables = [
@@ -128,7 +130,7 @@ def main(
 
         for pv in previous_versions:
             # reset cache, important!
-            fhirspec.FHIRClass.__known_classes__ = {}
+            fhirspec.FHIRClass.__known_classes__ = {} # type: ignore
             customs = {
                 "SPECIFICATION_URL": "/".join([settings.FHIR_BASE_URL, pv]),
                 "RESOURCE_TARGET_DIRECTORY": originals["RESOURCE_TARGET_DIRECTORY"]
@@ -154,7 +156,7 @@ def main(
                     update_pytest_fixture(settings)
 
         # restore originals
-        fhirspec.FHIRClass.__known_classes__ = {}
+        fhirspec.FHIRClass.__known_classes__ = {} # type: ignore
         settings.update(originals)
 
     return 0
@@ -174,6 +176,11 @@ def generate_from_fhir_spec(
 ):
     """ """
     spec = fhirspec.FHIRSpec(settings, spec_source)
+
+    add_igs_to_spec(spec, fhir_package_files(pathlib.Path('../fhir_package/.fhir-package-cache/hl7.terminology.r4#6.3.0')))
+    add_igs_to_spec(spec, fhir_package_files(pathlib.Path('../fhir_package/.fhir-package-cache/hl7.fhir.uv.genomics-reporting#2.0.0')))
+    add_igs_to_spec(spec, fhir_package_files(pathlib.Path('../fhir_package/.fhir-package-cache/hl7.fhir.uv.phenomics-exchange.r4b#0.1.0')))
+
     if dry_run is False:
         spec.write()
         # ensure init py has been created
@@ -184,7 +191,5 @@ if "__main__" == __name__:
     try:
         sys.exit(main())
     except KeyboardInterrupt:
-        click.echo(
-            "Operation aborted, as interrupted by user.", color=click.style("yellow")
-        )
+        click.echo(click.style("Operation aborted, as interrupted by user.", fg="yellow"))
         sys.exit(1)

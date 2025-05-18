@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from logger import logger
+from .logger import logger
 from fhirspec import Configuration
 from fhirspec import download
 import pathlib
@@ -87,8 +87,53 @@ class FHIRLoader(object):
         """ Expand the ZIP file at the given path to the cache directory.
         """
         assert filepath.exists() and filepath.is_file()
+        print(f"expanding {filepath} to {target}")
         # import here as we can bypass its use with a manual unzip
         import zipfile
 
+        # make sure the target directory exists
+        target.mkdir(parents=True, exist_ok=True)
+
         with zipfile.ZipFile(filepath) as z:
-            z.extractall(target)
+            # 1) filter out the “noise” entries
+            all_members = z.infolist()
+            real_members = [
+                m for m in all_members
+                if not m.filename.startswith('__MACOSX/')
+            ]
+
+            # 2) find all top‐level names (the bit before the first '/')
+            roots = {
+                pathlib.Path(m.filename).parts[0]
+                for m in real_members
+                if m.filename.strip()  # skip any zero‐length names
+            }
+
+            # if exactly one root folder, strip it
+            if len(roots) == 1:
+                root = roots.pop().rstrip('/') + '/'    # e.g. "myapp/"
+                for m in real_members:
+                    if not m.filename.startswith(root):
+                        # skip anything not under that one folder
+                        continue
+
+                    # compute the path *inside* the archive, sans the root prefix
+                    inner_path = pathlib.Path(m.filename[len(root):])
+                    if not inner_path.parts:
+                        # this was exactly the folder itself, no file to write
+                        continue
+
+                    outpath = target / inner_path
+
+                    if m.is_dir():
+                        outpath.mkdir(parents=True, exist_ok=True)
+                    else:
+                        outpath.parent.mkdir(parents=True, exist_ok=True)
+                        with z.open(m) as src, open(outpath, 'wb') as dst:
+                            dst.write(src.read())
+            else:
+                # more than one real root → just extract everything normally
+                # (still drop __MACOSX/)
+                members_to_extract = [m.filename for m in all_members
+                                    if not m.filename.startswith('__MACOSX/')]
+                z.extractall(target, members=members_to_extract)

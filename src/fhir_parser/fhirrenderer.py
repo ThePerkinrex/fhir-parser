@@ -13,7 +13,7 @@ from jinja2 import Environment, PackageLoader, TemplateNotFound
 from jinja2.filters import contextfilter
 from markupsafe import Markup
 
-from logger import logger
+from .logger import logger
 
 
 @contextfilter
@@ -64,7 +64,7 @@ class FHIRRenderer(object):
         self.spec = spec
         self.settings = settings
         self.jinjaenv = Environment(
-            loader=PackageLoader("generate", self.settings.TEMPLATE_DIRECTORY)
+            loader=PackageLoader("fhir_parser.generate", self.settings.TEMPLATE_DIRECTORY)
         )
         self.jinjaenv.filters["string_wrap"] = string_wrap
         self.jinjaenv.filters["unique_func_name"] = unique_func_name
@@ -189,6 +189,7 @@ class FHIRStructureDefinitionRenderer(FHIRRenderer):
                     )
                 continue
 
+            logger.info(f'Processing {profile.name}')
             imports = profile.needed_external_classes()
             need_fhirtypes: bool = False
             has_one_of_many = False
