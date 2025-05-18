@@ -1,0 +1,31 @@
+[project]
+name = "fhir-parser"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Your Name",email = "you@example.com"}
+]
+license = {text = "Apache 2.0"}
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "jinja2 (==3.0.3)",
+    "markupsafe (>=3.0.2,<4.0.0)",
+    "requests (>=2.32.3,<3.0.0)",
+    "colorlog (==2.10.0)",
+    "click (>=8.2.0,<9.0.0)",
+    "fhirspec (>=0.4.0,<0.5.0)",
+    "pydantic (>=2.11.4,<3.0.0)",
+    "antlr4-tools (>=0.2.2,<0.3.0)",
+    "fhir-core (>=1.0.1,<2.0.0)"
+]
+
+[tool.poetry]
+packages = [
+    { include = "fhir_parser", from = "src" },
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
